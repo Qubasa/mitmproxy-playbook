@@ -2,8 +2,34 @@
   hosts: all
   become: yes
   become_method: sudo
-
   gather_facts: False
+
+
+  vars:
+    user_name: "mitm"
+
+  vars_prompt:
+    - name: "pubkey_path"
+      prompt: "Enter path to your ssh pubkey"
+      default: "~/.ssh/id_rsa.pub"
+      private: no
+    - name: "mitm_password"
+      prompt: "Password of user mitm"
+      private: yes
+    - name: "mitm_interface"
+      prompt: "Mitm interface"
+      private: no
+    - name: "own_ip"
+      prompt: "Desired static ip"
+      private: no
+    - name: "start_ip_range"
+      prompt: "Start ip range"
+      private: no
+    - name: "end_ip_range"
+      prompt: "End ip range"
+      private: no
+
+
   pre_tasks:
     - name: Install python for Ansible
       raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
@@ -12,6 +38,10 @@
       tags: always
     - setup: # aka gather_facts
 
+    - name: Get local ssh public key
+      local_action: shell cat ~/.ssh/id_rsa.pub
+      become: no
+      register: pubkey_string
 
   roles:
     - { role: mitm, tags: ['mitm'] }
