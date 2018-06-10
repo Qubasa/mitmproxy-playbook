@@ -4,6 +4,10 @@
     update_cache: yes
     cache_valid_time: 3600
 
+- name: Install mkpasswd
+  apt:
+    name: whois
+
 - name: Install mitmproxy
   apt:
     name: mitmproxy
@@ -26,12 +30,23 @@
 - debug:
     msg: "Your pubkey: {{pubkey_string.stdout}}"
 
+- name: Hash password
+  shell: mkpasswd --method=sha-512 "{{mitm_password}}"
+  register: mitm_hash
+  no_log: True
+
+- debug:
+    msg: "Your hashed password: {{mitm_hash.stdout}}"
+
+
 - name: Create user mitm
   user:
     create_home: yes
     group: sudo
     name: "{{user_name}}"
-    password: "{{mitm_password}}"
+    password: "{{mitm_hash.stdout}}"
+    shell: /bin/bash
+    update_password: always
 
 
 - name: Set mitm users authorized key file
@@ -47,10 +62,15 @@
       iface {{mitm_interface}} inet static
         address {{own_ip}}
         netmask 255.255.255.0
+- name: Delete dnsmasq.conf
+  file:
+    path: /etc/dnsmasq.conf
+    state: absent
 
 - name: Setting up dhcp-server
   blockinfile:
     path: /etc/dnsmasq.conf
+    create: yes
     block: |
       interface={{mitm_interface}}
       dhcp-range={{start_ip_range}},{{end_ip_range}},96h
@@ -61,7 +81,7 @@
   systemd:
     enabled: yes
     name: dnsmasq
-    state: started
+    state: restarted
 
 - name: Restart network service for interface "{{mitm_interface}}"
   systemd:
@@ -69,7 +89,8 @@
     name: networking
     state: restarted
 
-- sysctl:
+- name: Activate ip4 forwarding
+  sysctl:
     name: net.ipv4.ip_forward
     value: 1
     sysctl_set: yes
@@ -101,24 +122,27 @@
 - debug:
     msg: "Create scripts in homefolder"
 
-- name: interface.conf
-  blockinfile:
-    path: ~/interface.conf
-    create: yes
-    block: |
-      {{mitm_interface}}
-
-- git:
+- name: Checking out mitm scripts
+  git:
     repo: "https://github.com/Luis-Hebendanz/network-mitm-scripts.git"
     dest: "/home/{{user_name}}/mitm-scripts"
+    version: HEAD
+
+- name: interface.conf
+  lineinfile:
+    path: /home/"{{user_name}}"/mitm-scripts/interface.conf
+    create: yes
+    line: "{{mitm_interface}}"
 
 # create a share directory if it doesn't exist
-- file:
+- name: Create 'Share' directory
+  file:
     path: /home/"{{user_name}}"/Share
     state: directory
     mode: 0755
 
-- file:
+- name: Create 'out' directory
+  file:
     path: /home/"{{user_name}}"/mitm-scripts/out
     state: directory
     mode: 0755

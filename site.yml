@@ -16,18 +16,23 @@
     - name: "mitm_password"
       prompt: "Password of user mitm"
       private: yes
+      default: "mitm"
     - name: "mitm_interface"
       prompt: "Mitm interface"
       private: no
+      default: "ens10"
     - name: "own_ip"
       prompt: "Desired static ip"
       private: no
+      default: "192.168.4.1"
     - name: "start_ip_range"
       prompt: "Start ip range"
       private: no
+      default: "192.168.4.2"
     - name: "end_ip_range"
       prompt: "End ip range"
       private: no
+      default: "192.168.4.250"
 
 
   pre_tasks:
@@ -42,6 +47,8 @@
       local_action: shell cat ~/.ssh/id_rsa.pub
       become: no
       register: pubkey_string
+
+
 
   roles:
     - { role: mitm, tags: ['mitm'] }
