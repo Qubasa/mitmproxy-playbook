@@ -1,4 +1,4 @@
-# Ansible script to set up mitmproxy vm
+# Ansible script to set up a mitmproxy vm
 
 ## Dependencies
 ```

@@ -35,12 +35,6 @@
     line: "PubkeyAuthentication yes"
     path: /etc/ssh/sshd_config
 
-- name: Deactivate ssh password auth
-  lineinfile:
-    line: "PasswordAuthentication no"
-    path: /etc/ssh/sshd_config
-  when: ssh_pwd_auth == "yes"
-
 - name: Hash password
   shell: mkpasswd --method=sha-512 "{{mitm_password}}"
   register: mitm_hash
@@ -60,6 +54,12 @@
   authorized_key:
     user: "{{user_name}}"
     key: "{{pubkey_string.stdout}}"
+
+- name: Deactivate ssh password auth
+  lineinfile:
+    line: "PasswordAuthentication no"
+    path: /etc/ssh/sshd_config
+  when: ssh_pwd_auth == "yes"
 
 - name: Setting static ip
   blockinfile:
@@ -126,8 +126,9 @@
     jump: REDIRECT
     to_ports: 8080
 
-- debug:
-    msg: "Create scripts in homefolder"
+- name: Make iptables-persistent
+  apt:
+    name: iptables-persistent
 
 - name: Checking out mitm scripts
   git:
