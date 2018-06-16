@@ -30,14 +30,21 @@
 - debug:
     msg: "Your pubkey: {{pubkey_string.stdout}}"
 
+- name: Activate pubkey auth
+  lineinfile:
+    line: "PubkeyAuthentication yes"
+    path: /etc/ssh/sshd_config
+
+- name: Deactivate ssh password auth
+  lineinfile:
+    line: "PasswordAuthentication no"
+    path: /etc/ssh/sshd_config
+  when: ssh_pwd_auth == "yes"
+
 - name: Hash password
   shell: mkpasswd --method=sha-512 "{{mitm_password}}"
   register: mitm_hash
   no_log: True
-
-- debug:
-    msg: "Your hashed password: {{mitm_hash.stdout}}"
-
 
 - name: Create user mitm
   user:
@@ -130,7 +137,7 @@
 
 - name: interface.conf
   lineinfile:
-    path: /home/"{{user_name}}"/mitm-scripts/interface.conf
+    path: "/home/{{user_name}}/mitm-scripts/interface.conf"
     create: yes
     line: "{{mitm_interface}}"
 

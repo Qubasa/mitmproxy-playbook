@@ -7,6 +7,7 @@
 
   vars:
     user_name: "mitm"
+    ok: "yes"
 
   vars_prompt:
     - name: "pubkey_path"
@@ -17,6 +18,10 @@
       prompt: "Password of user mitm"
       private: yes
       default: "mitm"
+    - name: "ssh_pwd_auth"
+      prompt: "Deactivate ssh password auth? [yes/no]"
+      private: no
+      default: "yes"
     - name: "mitm_interface"
       prompt: "Mitm interface"
       private: no
