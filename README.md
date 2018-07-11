@@ -8,7 +8,7 @@ $ ansible --version
 ```
 
 To install the latest version of ansible on any to to the 
-(ansible doc)[https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#intro-installation-guide]
+[ansible doc](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#intro-installation-guide)
 
 
 ## How to execute
