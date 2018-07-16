@@ -104,31 +104,31 @@
     state: present
     reload: yes
 
-- name: Reroute http packets
-  iptables:
-    table: nat
-    action: append
-    chain: PREROUTING
-    in_interface: "{{mitm_interface}}"
-    protocol: tcp
-    destination_port: 80
-    jump: REDIRECT
-    to_ports: 8080
+# - name: Reroute http packets
+#   iptables:
+#     table: nat
+#     action: append
+#     chain: PREROUTING
+#     in_interface: "{{mitm_interface}}"
+#     protocol: tcp
+#     destination_port: 80
+#     jump: REDIRECT
+#     to_ports: 8080
 
-- name: Reroute https packets
-  iptables:
-    table: nat
-    action: append
-    chain: PREROUTING
-    in_interface: "{{mitm_interface}}"
-    protocol: tcp
-    destination_port: 443
-    jump: REDIRECT
-    to_ports: 8080
+# - name: Reroute https packets
+#   iptables:
+#     table: nat
+#     action: append
+#     chain: PREROUTING
+#     in_interface: "{{mitm_interface}}"
+#     protocol: tcp
+#     destination_port: 443
+#     jump: REDIRECT
+#     to_ports: 8080
 
-- name: Make iptables-persistent
-  apt:
-    name: iptables-persistent
+# - name: Make iptables-persistent
+#   apt:
+#     name: iptables-persistent
 
 - name: Checking out mitm scripts
   git:
@@ -138,7 +138,7 @@
 
 - name: interface.conf
   lineinfile:
-    path: "/home/{{user_name}}/mitm-scripts/interface.conf"
+    path: "/home/{{user_name}}/network-mitm-scripts/input_interface.conf"
     create: yes
     line: "{{mitm_interface}}"
 
@@ -151,7 +151,7 @@
 
 - name: Create 'out' directory
   file:
-    path: /home/"{{user_name}}"/mitm-scripts/out
+    path: /home/"{{user_name}}"/network-mitm-scripts/out
     state: directory
     mode: 0755
 
