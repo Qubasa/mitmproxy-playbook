@@ -24,4 +24,16 @@ OR
 Note: The semicolon after the ip address is there on purpose.
 Without it ansible doesn't recognize it as an entry in an inventory file.
 
+## How to use
+Create a private network in your VM manager without dhcp server!
+Attach the new network interface to the VM you want to inspect.
+If it is a Windows box you are good to go. If it is a linux VM you have to enable the interface
+by editing /etc/network/interfaces (ens10 is our private network interface) and add the following:
+
+```
+auto ens10
+allow-hotplug ens10
+iface ens10 inet dhcp
+
+```
 

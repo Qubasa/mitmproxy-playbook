@@ -12,6 +12,10 @@
   apt:
     name: mitmproxy
 
+- name: Install tcpdump
+  apt:
+    name: tcpdump
+
 - name: Install Iftop
   apt:
     name: iftop
@@ -23,6 +27,18 @@
 - name: Install dnsmasq
   apt:
     name: dnsmasq
+
+- name: Install git
+  apt:
+    name: git
+
+- name: Install wireshark
+  apt:
+    name: wireshark
+
+- name: Install tshark
+  apt:
+    name: tshark
 
 - debug:
     msg: "Mitm interface name: {{mitm_interface}}"
@@ -43,7 +59,9 @@
 - name: Create user mitm
   user:
     create_home: yes
-    group: sudo
+    groups:
+      - sudo
+      - wireshark
     name: "{{user_name}}"
     password: "{{mitm_hash.stdout}}"
     shell: /bin/bash
@@ -69,6 +87,7 @@
       iface {{mitm_interface}} inet static
         address {{own_ip}}
         netmask 255.255.255.0
+
 - name: Delete dnsmasq.conf
   file:
     path: /etc/dnsmasq.conf
@@ -88,12 +107,6 @@
   systemd:
     enabled: yes
     name: dnsmasq
-    state: restarted
-
-- name: Restart network service for interface "{{mitm_interface}}"
-  systemd:
-    daemon_reload: yes
-    name: networking
     state: restarted
 
 - name: Activate ip4 forwarding
@@ -138,7 +151,7 @@
 
 - name: interface.conf
   lineinfile:
-    path: "/home/{{user_name}}/network-mitm-scripts/input_interface.conf"
+    path: "/home/{{user_name}}/mitm-scripts/input_interface.conf"
     create: yes
     line: "{{mitm_interface}}"
 
@@ -151,7 +164,9 @@
 
 - name: Create 'out' directory
   file:
-    path: /home/"{{user_name}}"/network-mitm-scripts/out
+    path: /home/"{{user_name}}"/mitm-scripts/out
     state: directory
     mode: 0755
 
+- name: Reboot
+  reboot:

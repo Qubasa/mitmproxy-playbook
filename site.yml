@@ -29,15 +29,15 @@
     - name: "own_ip"
       prompt: "Desired static ip"
       private: no
-      default: "192.168.4.1"
+      default: "192.168.11.1"
     - name: "start_ip_range"
       prompt: "Start ip range"
       private: no
-      default: "192.168.4.2"
+      default: "192.168.11.2"
     - name: "end_ip_range"
       prompt: "End ip range"
       private: no
-      default: "192.168.4.250"
+      default: "192.168.11.250"
 
 
   pre_tasks:
